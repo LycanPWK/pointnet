@@ -7,7 +7,7 @@ from torch.autograd import Variable
 import torch.optim as optim
 batsz=50
 epochs=20
-sz=256
+sz=512
 class_num=10
 class t_net_1(nn.Module):
     def __init__(self):
