@@ -6,7 +6,7 @@ import torch.utils.data as dat
 path="dataset/"
 label=[]
 points=[]
-sampl_num=512
+sampl_num=1024
 cll=os.listdir(path)
 for cl in cll:
     fll=os.listdir(path+"/"+cl+"/"+"test/")
