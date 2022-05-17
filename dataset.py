@@ -17,8 +17,13 @@ for cl in cll:
         pcd=o3d.geometry.PointCloud()
         V_mesh = np.asarray(mesh.vertices)
         pcd = o3d.geometry.TriangleMesh.sample_points_uniformly(mesh, number_of_points=sampl_num)
-        points.append(np.asarray(pcd.points))
+        pc = np.asarray(pcd.points)
         label.append(cll.index(cl))
+        centroid = np.mean(pc, axis=0)
+        pc = pc - centroid
+        m = np.max(np.sqrt(np.sum(pc ** 2, axis=1)))
+        pc = pc / m
+        points.append(pc)
 np.save("data1.npy",np.asarray(points))
 np.save("label1.npy",np.asarray(label))
 for cl in cll:
@@ -30,7 +35,12 @@ for cl in cll:
         pcd=o3d.geometry.PointCloud()
         V_mesh = np.asarray(mesh.vertices)
         pcd = o3d.geometry.TriangleMesh.sample_points_uniformly(mesh, number_of_points=sampl_num)
-        points.append(np.asarray(pcd.points))
+        pc = np.asarray(pcd.points)
+        centroid = np.mean(pc, axis=0)
+        pc = pc - centroid
+        m = np.max(np.sqrt(np.sum(pc ** 2, axis=1)))
+        pc = pc / m
+        points.append(pc)
         label.append(cll.index(cl))
 np.save("data.npy",np.asarray(points))
 np.save("label.npy",np.asarray(label))

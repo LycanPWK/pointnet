@@ -6,7 +6,7 @@ import torch.utils.data as dat
 from torch.autograd import Variable
 import torch.optim as optim
 batsz=50
-epochs=20
+epochs=200
 sz=1024
 class_num=10
 class t_net_1(nn.Module):
@@ -103,7 +103,7 @@ class pointnet_cla(nn.Module):
         x=f.relu(self.bn5(self.fc2(x)))
         x=self.fc3(x)
         self.dropout=nn.Dropout(p=0.3)
-        x=f.log_softmax(x)
+        x=f.log_softmax(x, dim=1)
         return x
 def rightness(predictions, labels):
     pred = t.max(predictions.data, 1)[1] 
@@ -126,7 +126,7 @@ def main():
     net = pointnet_cla()
     net.cuda()
     criterion = nn.CrossEntropyLoss() 
-    optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999)) 
+    optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999),eps=1e-08) 
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
     record = [] 
     weights = [] 
@@ -153,8 +153,8 @@ def main():
                 val_rights = [] 
                 
 
-                for (data, target) in test_loader:
-                    output = net(data) 
+                for (tdata, target) in test_loader:
+                    output = net(tdata) 
                     right = rightness(output, target) 
                     val_rights.append(right)
                 
@@ -162,14 +162,15 @@ def main():
                 test_r = (sum([tup[0] for tup in val_rights]), sum([tup[1] for tup in val_rights]))
                 
                 print('epochs: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\ttest AC: {:.2f}%\tval AC: {:.2f}%'.format(
-                    epoch, batch_idx * len(data), len(train_loader.dataset),
+                    epoch, batch_idx * data.size()[0], len(train_loader.dataset),
                     100. * batch_idx / len(train_loader), loss.item(), 
                     100. * train_r[0] / train_r[1], 
                     100. * test_r[0] / test_r[1]))
                 
        
                 record.append((100 - 100. * train_r[0] / train_r[1], 100 - 100. * test_r[0] / test_r[1]))
-                
+        if(epoch%10 == 0):
+            t.save(net.state_dict(), str(epoch)+'.pt')        
 if __name__=="__main__":
     main()
                 
