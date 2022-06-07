@@ -1,13 +1,13 @@
 import open3d as o3d
 import os
 import igl
+import train as tt
 import numpy as np
-import torch.utils.data as dat
 path="dataset/"
 label=[]
 points=[]
-sampl_num=1024
 cll=os.listdir(path)
+
 for cl in cll:
     fll=os.listdir(path+"/"+cl+"/"+"test/")
     for fl in fll:
@@ -16,7 +16,7 @@ for cl in cll:
         mesh = o3d.io.read_triangle_mesh(path+"/"+cl+"/"+"test/"+fl)
         pcd=o3d.geometry.PointCloud()
         V_mesh = np.asarray(mesh.vertices)
-        pcd = o3d.geometry.TriangleMesh.sample_points_uniformly(mesh, number_of_points=sampl_num)
+        pcd = o3d.geometry.TriangleMesh.sample_points_uniformly(mesh, number_of_points=tt.sz)
         pc = np.asarray(pcd.points)
         label.append(cll.index(cl))
         centroid = np.mean(pc, axis=0)
@@ -33,8 +33,7 @@ for cl in cll:
             continue
         mesh = o3d.io.read_triangle_mesh(path+"/"+cl+"/"+"train/"+fl)
         pcd=o3d.geometry.PointCloud()
-        V_mesh = np.asarray(mesh.vertices)
-        pcd = o3d.geometry.TriangleMesh.sample_points_uniformly(mesh, number_of_points=sampl_num)
+        pcd = o3d.geometry.TriangleMesh.sample_points_uniformly(mesh, number_of_points=tt.sz)
         pc = np.asarray(pcd.points)
         centroid = np.mean(pc, axis=0)
         pc = pc - centroid

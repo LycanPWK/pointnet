@@ -2,6 +2,7 @@ import torch as t
 import torch.nn as nn
 import torch.nn.functional as f
 import numpy as np
+#from torch.utils.tensorboard import SummaryWriter 
 import torch.utils.data as dat
 from torch.autograd import Variable
 import torch.optim as optim
@@ -130,7 +131,7 @@ def main():
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
     record = [] 
     weights = [] 
-
+    writer = SummaryWriter('./log/')
 
     for epoch in range(epochs):
         print(epoch)
@@ -167,9 +168,12 @@ def main():
                     100. * train_r[0] / train_r[1], 
                     100. * test_r[0] / test_r[1]))
                 
-       
+                writer.add_scalar('test AC',100. * train_r[0] / train_r[1],epoch*len(train_loader)+batch_idx)
+                writer.add_scalar('val AC',100. * test_r[0] / test_r[1],epoch*len(train_loader)+batch_idx)
+                writer.add_scalar('loss',loss.item(),epoch*len(train_loader)+batch_idx)
+
                 record.append((100 - 100. * train_r[0] / train_r[1], 100 - 100. * test_r[0] / test_r[1]))
-        if(epoch%10 == 0):
+        if(epoch%5 == 0):
             t.save(net.state_dict(), str(epoch)+'.pt')        
 if __name__=="__main__":
     main()
