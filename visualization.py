@@ -34,11 +34,13 @@ for (tdata, target) in test_loader:
     ind,pred=np.asarray(rights)
     p=np.asarray(pred.cpu())
     l=np.asarray(target.cpu())
-    if(l!=p):
+    d=np.asarray(tdata.cpu())
+    if(l==1):
         print(p,l,'\n')
         pcd=o3d.open3d.geometry.PointCloud()
         mesh=o3d.io.read_triangle_mesh(meshes[i])
         pcd = o3d.geometry.TriangleMesh.sample_points_uniformly(mesh, number_of_points=tt.sz)
+        #pcd.points =o3d.open3d.utility.Vector3dVector(d[0])
         pcd.paint_uniform_color([1.0, 0.5, 0.0])
         mesh.compute_vertex_normals()
         o3d.visualization.draw_geometries([pcd,mesh])
